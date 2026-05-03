@@ -1,0 +1,10 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<c:set var="navBase" value="admin"/><c:set var="navRole" value="Admin"/><c:set var="activeNav" value="categories"/><c:set var="pageTitle" value="Manage Categories"/><c:set var="pageSubtitle" value="Maintain customer-facing service categories."/>
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manage Categories - QuickFix</title><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/forms.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css"></head>
+<body><div class="app-shell"><%@ include file="../includes/sidebar.jspf" %><main><%@ include file="../includes/topbar.jspf" %><section class="page">
+    <div class="content-grid"><section class="card"><div class="card__header"><h1 class="card__title">Category form</h1></div><form class="card__body form" method="post"><input type="hidden" name="action" value="category"><div class="form__grid"><label class="field"><span class="field__label">Category name</span><input class="field__control" name="categoryName" required></label><label class="field"><span class="field__label">Description</span><input class="field__control" name="description"></label></div><label class="field"><span class="field__label">Active</span><input type="checkbox" name="active" checked></label><button class="btn btn--primary" type="submit">Save category</button></form></section><section class="card table-card"><table class="table"><thead><tr><th>Name</th><th>Description</th><th>Active</th></tr></thead><tbody><c:forEach items="${categories}" var="c"><tr><td><strong>${c.categoryName}</strong></td><td>${c.description}</td><td>${c.active}</td></tr></c:forEach></tbody></table></section></div>
+</section></main></div></body>
+</html>
