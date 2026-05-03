@@ -1,0 +1,13 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<c:set var="navBase" value="provider"/><c:set var="navRole" value="Provider"/><c:set var="activeNav" value="services"/><c:set var="pageTitle" value="Manage Services"/><c:set var="pageSubtitle" value="Create, review, and remove provider service listings."/>
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manage Services - QuickFix</title><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/forms.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css"></head>
+<body><div class="app-shell"><%@ include file="../includes/sidebar.jspf" %><main><%@ include file="../includes/topbar.jspf" %><section class="page">
+    <div class="content-grid">
+        <section class="card"><div class="card__header"><h1 class="card__title">New service</h1></div><form class="card__body form" method="post"><input type="hidden" name="action" value="service"><div class="form__grid"><label class="field"><span class="field__label">Category</span><select class="field__control" name="categoryId"><c:forEach items="${categories}" var="c"><option value="${c.categoryId}">${c.categoryName}</option></c:forEach></select></label><label class="field"><span class="field__label">Price</span><input class="field__control" name="price" type="number" step="0.01" required></label></div><label class="field"><span class="field__label">Service title</span><input class="field__control" name="serviceTitle" required></label><label class="field"><span class="field__label">Description</span><textarea class="field__control" name="description"></textarea></label><button class="btn btn--primary" type="submit">Save service</button></form></section>
+        <section class="card table-card"><div class="card__header"><h2 class="card__title">Service catalog</h2></div><table class="table"><thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Action</th></tr></thead><tbody><c:forEach items="${services}" var="s"><tr><td><strong>${s.serviceTitle}</strong></td><td>${s.categoryName}</td><td>Rs. ${s.price}</td><td><form method="post"><input type="hidden" name="action" value="deleteService"><input type="hidden" name="serviceId" value="${s.serviceId}"><button class="btn btn--danger btn--sm" type="submit">Delete</button></form></td></tr></c:forEach></tbody></table></section>
+    </div>
+</section></main></div></body>
+</html>
