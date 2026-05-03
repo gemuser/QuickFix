@@ -1,0 +1,37 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<aside class="sidebar">
+    <a class="sidebar__brand" href="${pageContext.request.contextPath}/${navBase}/dashboard">
+        <img class="sidebar__logo" src="${pageContext.request.contextPath}/assets/images/quickfix-wordmark.png" alt="QuickFix">
+    </a>
+    <p class="sidebar__section">${navRole}</p>
+    <ul class="sidebar__nav">
+        <c:choose>
+            <c:when test="${navBase == 'customer'}">
+                <li><a class="sidebar__link ${activeNav == 'dashboard' ? 'sidebar__link--active' : ''}" href="dashboard"><span class="sidebar__icon">D</span>Dashboard</a></li>
+                <li><a class="sidebar__link ${activeNav == 'search' ? 'sidebar__link--active' : ''}" href="search-services"><span class="sidebar__icon">S</span>Search services</a></li>
+                <li><a class="sidebar__link ${activeNav == 'bookings' ? 'sidebar__link--active' : ''}" href="booking-history"><span class="sidebar__icon">B</span>Bookings</a></li>
+                <li><a class="sidebar__link ${activeNav == 'feedback' ? 'sidebar__link--active' : ''}" href="feedback"><span class="sidebar__icon">F</span>Feedback</a></li>
+            </c:when>
+            <c:when test="${navBase == 'provider'}">
+                <li><a class="sidebar__link ${activeNav == 'dashboard' ? 'sidebar__link--active' : ''}" href="dashboard"><span class="sidebar__icon">D</span>Dashboard</a></li>
+                <li><a class="sidebar__link ${activeNav == 'profile' ? 'sidebar__link--active' : ''}" href="manage-profile"><span class="sidebar__icon">P</span>Profile</a></li>
+                <li><a class="sidebar__link ${activeNav == 'services' ? 'sidebar__link--active' : ''}" href="manage-services"><span class="sidebar__icon">S</span>Services</a></li>
+                <li><a class="sidebar__link ${activeNav == 'availability' ? 'sidebar__link--active' : ''}" href="availability"><span class="sidebar__icon">A</span>Availability</a></li>
+                <li><a class="sidebar__link ${activeNav == 'requests' ? 'sidebar__link--active' : ''}" href="booking-requests"><span class="sidebar__icon">R</span>Requests</a></li>
+                <li><a class="sidebar__link ${activeNav == 'past' ? 'sidebar__link--active' : ''}" href="past-bookings"><span class="sidebar__icon">H</span>Past bookings</a></li>
+            </c:when>
+            <c:otherwise>
+                <li><a class="sidebar__link ${activeNav == 'dashboard' ? 'sidebar__link--active' : ''}" href="dashboard"><span class="sidebar__icon">D</span>Dashboard</a></li>
+                <li><a class="sidebar__link ${activeNav == 'users' ? 'sidebar__link--active' : ''}" href="manage-users"><span class="sidebar__icon">U</span>Users</a></li>
+                <li><a class="sidebar__link ${activeNav == 'providers' ? 'sidebar__link--active' : ''}" href="manage-providers"><span class="sidebar__icon">P</span>Providers</a></li>
+                <li><a class="sidebar__link ${activeNav == 'categories' ? 'sidebar__link--active' : ''}" href="manage-categories"><span class="sidebar__icon">C</span>Categories</a></li>
+                <li><a class="sidebar__link ${activeNav == 'bookings' ? 'sidebar__link--active' : ''}" href="monitor-bookings"><span class="sidebar__icon">B</span>Bookings</a></li>
+                <li><a class="sidebar__link ${activeNav == 'complaints' ? 'sidebar__link--active' : ''}" href="complaints"><span class="sidebar__icon">I</span>Complaints</a></li>
+                <li><a class="sidebar__link ${activeNav == 'reports' ? 'sidebar__link--active' : ''}" href="reports"><span class="sidebar__icon">R</span>Reports</a></li>
+            </c:otherwise>
+        </c:choose>
+        <li><a class="sidebar__link" data-logout-link href="${pageContext.request.contextPath}/logout"><span class="sidebar__icon">L</span>Logout</a></li>
+    </ul>
+</aside>
+<%@ include file="logout-confirm.jspf" %>
+<script src="${pageContext.request.contextPath}/assets/js/main.js" defer></script>

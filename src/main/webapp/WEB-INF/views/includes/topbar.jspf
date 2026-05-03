@@ -1,0 +1,17 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<header class="topbar">
+    <div>
+        <h2 class="topbar__title">${pageTitle}</h2>
+        <p class="topbar__meta">${pageSubtitle}</p>
+    </div>
+    <div class="topbar__actions">
+        <button class="notification-button" type="button" aria-label="Notifications"></button>
+        <div class="profile-chip">
+            <span class="profile-chip__avatar">Q</span>
+            <span>
+                <span class="profile-chip__name">${empty sessionScope.user.fullName ? 'QuickFix User' : sessionScope.user.fullName}</span>
+                <span class="profile-chip__role">${navRole}</span>
+            </span>
+        </div>
+    </div>
+</header>

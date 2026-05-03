@@ -1,0 +1,51 @@
+<div class="logout-confirm" data-logout-dialog hidden>
+    <div class="logout-confirm__backdrop" data-logout-cancel></div>
+    <section class="logout-confirm__panel" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
+        <h2 class="logout-confirm__title" id="logoutConfirmTitle">Log out?</h2>
+        <p class="logout-confirm__text">You will need to sign in again to access your workspace.</p>
+        <div class="logout-confirm__actions">
+            <button class="btn btn--secondary" type="button" data-logout-cancel>Cancel</button>
+            <a class="btn btn--danger" data-logout-confirm href="${pageContext.request.contextPath}/logout">Log out</a>
+        </div>
+    </section>
+</div>
+<script>
+    (function () {
+        var dialog = document.querySelector("[data-logout-dialog]");
+        if (!dialog || dialog.dataset.ready === "true") return;
+        dialog.dataset.ready = "true";
+
+        var confirmLink = dialog.querySelector("[data-logout-confirm]");
+        var lastTrigger = null;
+
+        function openDialog(event) {
+            event.preventDefault();
+            lastTrigger = event.currentTarget;
+            confirmLink.href = lastTrigger.href;
+            dialog.hidden = false;
+            dialog.dataset.state = "open";
+            document.body.classList.add("has-modal");
+            dialog.querySelector("[data-logout-cancel]").focus();
+        }
+
+        function closeDialog() {
+            dialog.dataset.state = "closing";
+            document.body.classList.remove("has-modal");
+            window.setTimeout(function () {
+                dialog.hidden = true;
+                dialog.dataset.state = "";
+                if (lastTrigger) lastTrigger.focus();
+            }, 180);
+        }
+
+        document.querySelectorAll("[data-logout-link]").forEach(function (link) {
+            link.addEventListener("click", openDialog);
+        });
+        dialog.querySelectorAll("[data-logout-cancel]").forEach(function (control) {
+            control.addEventListener("click", closeDialog);
+        });
+        document.addEventListener("keydown", function (event) {
+            if (!dialog.hidden && event.key === "Escape") closeDialog();
+        });
+    })();
+</script>

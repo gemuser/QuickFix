@@ -1,0 +1,233 @@
+.app-shell {
+    min-height: 100vh;
+    padding-left: 220px;
+}
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 220px;
+    padding: 16px 12px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.sidebar__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 8px 16px;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sidebar__logo {
+    display: block;
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+}
+
+.sidebar__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--primary);
+    color: #FFFFFF;
+}
+
+.sidebar__section {
+    margin: 16px 8px 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.sidebar__nav {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.sidebar__link:hover,
+.sidebar__link--active {
+    background: #EFF6FF;
+    color: var(--primary);
+}
+
+.sidebar__link:hover {
+    transform: translateX(2px);
+}
+
+.sidebar__icon {
+    width: 18px;
+    color: currentColor;
+    text-align: center;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.topbar__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.topbar__meta {
+    display: none;
+}
+
+.topbar__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.notification-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.notification-button:hover {
+    border-color: rgba(6, 46, 99, 0.28);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+
+.notification-button::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--primary);
+    box-shadow: 0 0 0 4px #EFF6FF;
+}
+
+.profile-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-chip__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.profile-chip__name {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-chip__role {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.page {
+    max-width: 1200px;
+    padding: 24px;
+}
+
+.page__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.page__eyebrow {
+    margin: 0 0 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.page__title {
+    margin: 0;
+}
+
+.page__description {
+    margin: 8px 0 0;
+    max-width: 640px;
+}
+
+@media (max-width: 900px) {
+    .app-shell {
+        padding-left: 0;
+    }
+
+    .sidebar {
+        position: static;
+        width: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar__nav {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .topbar,
+    .page__header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .topbar {
+        min-height: auto;
+        padding: 16px;
+    }
+
+    .topbar__actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

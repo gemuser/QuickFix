@@ -1,0 +1,20 @@
+<header class="market-header">
+    <div class="container market-header__inner">
+        <a class="brand" href="${pageContext.request.contextPath}/customer/dashboard">
+            <img class="brand__logo" src="${pageContext.request.contextPath}/assets/images/quickfix-wordmark.png" alt="QuickFix">
+        </a>
+        <nav class="market-nav" aria-label="Customer navigation">
+            <a class="market-nav__link ${activeNav == 'home' ? 'market-nav__link--active' : ''}" href="dashboard">Home</a>
+            <a class="market-nav__link ${activeNav == 'services' ? 'market-nav__link--active' : ''}" href="search-services">Services</a>
+            <a class="market-nav__link ${activeNav == 'bookings' ? 'market-nav__link--active' : ''}" href="booking-history">My Bookings</a>
+            <a class="market-nav__link ${activeNav == 'feedback' ? 'market-nav__link--active' : ''}" href="feedback">Feedback</a>
+        </nav>
+        <div class="market-header__actions">
+            <a class="market-icon-button" href="dashboard" aria-label="Notifications"></a>
+            <span class="market-profile">Profile</span>
+            <a class="btn btn--secondary btn--sm" data-logout-link href="${pageContext.request.contextPath}/logout">Logout</a>
+        </div>
+    </div>
+</header>
+<%@ include file="logout-confirm.jspf" %>
+<script src="${pageContext.request.contextPath}/assets/js/main.js" defer></script>
