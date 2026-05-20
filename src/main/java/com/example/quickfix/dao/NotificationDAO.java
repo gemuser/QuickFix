@@ -26,6 +26,18 @@ public class NotificationDAO {
         }
         return list;
     }
+    public int countUnread(int userId) throws SQLException {
+        try (Connection c = DBConnection.getConnection(); PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM notifications WHERE user_id=? AND is_read=FALSE")) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) { return rs.next() ? rs.getInt(1) : 0; }
+        }
+    }
+    public void markAllRead(int userId) throws SQLException {
+        try (Connection c = DBConnection.getConnection(); PreparedStatement ps = c.prepareStatement("UPDATE notifications SET is_read=TRUE WHERE user_id=?")) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        }
+    }
 
     private String titleColumn(Connection c) throws SQLException {
         return hasColumn(c, "notifications", "title") ? "title" : "notification_title";

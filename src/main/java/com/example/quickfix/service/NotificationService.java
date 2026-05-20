@@ -17,4 +17,12 @@ public class NotificationService {
     public List<Notification> recent(int userId) throws Exception {
         return notificationDAO.findByUser(userId);
     }
+
+    public int unreadCount(int userId) throws Exception {
+        return notificationDAO.countUnread(userId);
+    }
+
+    public void markAllRead(int userId) throws Exception {
+        notificationDAO.markAllRead(userId);
+    }
 }

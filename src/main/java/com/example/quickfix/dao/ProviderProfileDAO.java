@@ -13,8 +13,9 @@ public class ProviderProfileDAO {
         try (Connection c = DBConnection.getConnection()) {
             String profileIdColumn = resolveProfileIdColumn(c);
             String verificationStatusColumn = resolveVerificationStatusColumn(c);
+            String ratingProviderExpression = ratingsFeedbackUsesProfileId(c) ? "p." + profileIdColumn : "p.user_id";
             String sql = "SELECT p." + profileIdColumn + " AS profile_id, p.user_id, p.bio, p.experience_years, p." + verificationStatusColumn + " AS verification_status, " +
-                    "COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=p.user_id),0) AS average_rating, " +
+                    "COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=" + ratingProviderExpression + "),0) AS average_rating, " +
                     "u.full_name provider_name, u.email, u.phone FROM provider_profiles p JOIN users u ON p.user_id=u.user_id WHERE p.user_id=?";
             try (PreparedStatement ps = c.prepareStatement(sql)) {
                 ps.setInt(1, userId);
@@ -27,8 +28,9 @@ public class ProviderProfileDAO {
         try (Connection c = DBConnection.getConnection()) {
             String profileIdColumn = resolveProfileIdColumn(c);
             String verificationStatusColumn = resolveVerificationStatusColumn(c);
+            String ratingProviderExpression = ratingsFeedbackUsesProfileId(c) ? "p." + profileIdColumn : "p.user_id";
             String sql = "SELECT p." + profileIdColumn + " AS profile_id, p.user_id, p.bio, p.experience_years, p." + verificationStatusColumn + " AS verification_status, " +
-                    "COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=p.user_id),0) AS average_rating, " +
+                    "COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=" + ratingProviderExpression + "),0) AS average_rating, " +
                     "u.full_name provider_name, u.email, u.phone FROM provider_profiles p JOIN users u ON p.user_id=u.user_id ORDER BY p." + verificationStatusColumn + ", u.full_name";
             try (PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(map(rs));
@@ -96,5 +98,24 @@ public class ProviderProfileDAO {
         try (ResultSet rs = meta.getColumns(c.getCatalog(), null, "PROVIDER_PROFILES", columnName.toUpperCase(Locale.ROOT))) {
             return rs.next();
         }
+    }
+
+    private boolean ratingsFeedbackUsesProfileId(Connection c) throws SQLException {
+        DatabaseMetaData meta = c.getMetaData();
+        try (ResultSet rs = meta.getImportedKeys(c.getCatalog(), null, "ratings_feedback")) {
+            while (rs.next()) {
+                if ("provider_id".equalsIgnoreCase(rs.getString("FKCOLUMN_NAME"))) {
+                    return "provider_profiles".equalsIgnoreCase(rs.getString("PKTABLE_NAME"));
+                }
+            }
+        }
+        try (ResultSet rs = meta.getImportedKeys(c.getCatalog(), null, "RATINGS_FEEDBACK")) {
+            while (rs.next()) {
+                if ("PROVIDER_ID".equalsIgnoreCase(rs.getString("FKCOLUMN_NAME"))) {
+                    return "PROVIDER_PROFILES".equalsIgnoreCase(rs.getString("PKTABLE_NAME"));
+                }
+            }
+        }
+        return hasColumn(c, "provider_id") && !hasColumn(c, "profile_id");
     }
 }

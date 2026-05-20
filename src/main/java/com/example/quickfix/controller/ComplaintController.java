@@ -15,9 +15,14 @@ public class ComplaintController extends HttpServlet {
         User user = SessionUtil.currentUser(req);
         if (user == null) { resp.sendRedirect(req.getContextPath() + "/login"); return; }
         try {
+            String description = req.getParameter("description");
+            if (description == null || description.trim().isEmpty()) throw new IllegalArgumentException("Complaint description cannot be empty.");
             Complaint c = new Complaint();
             c.setRaisedBy(user.getUserId()); c.setBookingId(parseInt(req.getParameter("bookingId"))); c.setAgainstUserId(parseInt(req.getParameter("againstUserId")));
-            c.setSubject(req.getParameter("subject")); c.setDescription(req.getParameter("description")); complaintDAO.create(c);
+            c.setSubject(req.getParameter("subject") == null || req.getParameter("subject").isBlank() ? "Complaint" : req.getParameter("subject").trim()); c.setDescription(description.trim()); complaintDAO.create(c);
+            resp.sendRedirect(req.getHeader("Referer") == null ? req.getContextPath() + "/" : req.getHeader("Referer"));
+        } catch (IllegalArgumentException e) {
+            req.getSession().setAttribute("complaintError", e.getMessage());
             resp.sendRedirect(req.getHeader("Referer") == null ? req.getContextPath() + "/" : req.getHeader("Referer"));
         } catch (Exception e) { throw new ServletException(e); }
     }

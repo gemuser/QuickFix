@@ -3,6 +3,7 @@ package com.quickfix.controller;
 import com.quickfix.model.User;
 import com.quickfix.service.AuthService;
 import com.quickfix.util.SessionUtil;
+import com.quickfix.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -36,9 +37,14 @@ public class AuthController extends HttpServlet {
 
     private void handleRegister(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            populateRegisterForm(req);
+            if (!validateRegisterForm(req)) {
+                req.setAttribute("error", "Please correct the highlighted fields.");
+                req.getRequestDispatcher(VIEW_PREFIX + "/register.jsp").forward(req, resp);
+                return;
+            }
             String error = authService.register(req.getParameter("role"), req.getParameter("fullName"), req.getParameter("email"), req.getParameter("phone"), req.getParameter("password"));
             if (error != null) {
-                populateRegisterForm(req);
                 req.setAttribute("error", error);
                 req.getRequestDispatcher(VIEW_PREFIX + "/register.jsp").forward(req, resp);
                 return;
@@ -78,6 +84,32 @@ public class AuthController extends HttpServlet {
         req.setAttribute("fullName", req.getParameter("fullName") == null ? "" : req.getParameter("fullName").trim());
         req.setAttribute("email", normalizeEmail(req.getParameter("email")));
         req.setAttribute("phone", req.getParameter("phone") == null ? "" : req.getParameter("phone").trim());
+    }
+
+    private boolean validateRegisterForm(HttpServletRequest req) {
+        boolean valid = true;
+        String fullName = req.getParameter("fullName") == null ? "" : req.getParameter("fullName").trim();
+        String email = normalizeEmail(req.getParameter("email"));
+        String phone = req.getParameter("phone") == null ? "" : req.getParameter("phone").trim();
+        String password = req.getParameter("password");
+
+        if (ValidationUtil.isBlank(fullName)) {
+            req.setAttribute("fullNameError", "Full name is required.");
+            valid = false;
+        }
+        if (!ValidationUtil.isEmail(email)) {
+            req.setAttribute("emailError", "Enter a valid email address.");
+            valid = false;
+        }
+        if (!ValidationUtil.isPhone(phone)) {
+            req.setAttribute("phoneError", "Enter an optional + followed by 7 to 15 digits.");
+            valid = false;
+        }
+        if (!ValidationUtil.isStrongPassword(password)) {
+            req.setAttribute("passwordError", "Use at least 8 characters with a letter and a number.");
+            valid = false;
+        }
+        return valid;
     }
 
     private String normalizeRole(String role) {

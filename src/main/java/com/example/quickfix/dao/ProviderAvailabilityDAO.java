@@ -25,6 +25,52 @@ public class ProviderAvailabilityDAO {
             }
         }
     }
+    public void delete(int availabilityId, int providerId) throws SQLException {
+        try (Connection c = DBConnection.getConnection(); PreparedStatement ps = c.prepareStatement("DELETE FROM provider_availability WHERE availability_id=? AND provider_id=?")) {
+            ps.setInt(1, availabilityId);
+            ps.setInt(2, toStoredProviderId(c, providerId));
+            ps.executeUpdate();
+        }
+    }
+    public boolean hasOverlap(ProviderAvailability a) throws SQLException {
+        try (Connection c = DBConnection.getConnection()) {
+            boolean dateBased = hasColumn(c, "provider_availability", "available_date");
+            String sql = dateBased
+                ? "SELECT COUNT(*) FROM provider_availability WHERE provider_id=? AND available_date=? AND start_time < ? AND end_time > ?"
+                : "SELECT COUNT(*) FROM provider_availability WHERE provider_id=? AND day_of_week=? AND start_time < ? AND end_time > ?";
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, toStoredProviderId(c, a.getProviderId()));
+                if (dateBased) {
+                    ps.setDate(2, java.sql.Date.valueOf(a.getAvailableDate()));
+                } else {
+                    ps.setString(2, a.getAvailableDate().getDayOfWeek().toString().substring(0,1) + a.getAvailableDate().getDayOfWeek().toString().substring(1).toLowerCase());
+                }
+                ps.setTime(3, Time.valueOf(a.getEndTime()));
+                ps.setTime(4, Time.valueOf(a.getStartTime()));
+                try (ResultSet rs = ps.executeQuery()) { return rs.next() && rs.getInt(1) > 0; }
+            }
+        }
+    }
+    public boolean isProviderAvailable(int providerId, java.time.LocalDate date, java.time.LocalTime time) throws SQLException {
+        try (Connection c = DBConnection.getConnection()) {
+            boolean dateBased = hasColumn(c, "provider_availability", "available_date");
+            String sql = dateBased
+                ? "SELECT COUNT(*) FROM provider_availability WHERE provider_id=? AND available_date=? AND start_time<=? AND end_time>?"
+                : "SELECT COUNT(*) FROM provider_availability WHERE provider_id=? AND day_of_week=? AND start_time<=? AND end_time>?";
+            if (dateBased && hasColumn(c, "provider_availability", "is_available")) sql += " AND is_available=TRUE";
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, toStoredProviderId(c, providerId));
+                if (dateBased) {
+                    ps.setDate(2, java.sql.Date.valueOf(date));
+                } else {
+                    ps.setString(2, date.getDayOfWeek().toString().substring(0,1) + date.getDayOfWeek().toString().substring(1).toLowerCase());
+                }
+                ps.setTime(3, Time.valueOf(time));
+                ps.setTime(4, Time.valueOf(time));
+                try (ResultSet rs = ps.executeQuery()) { return rs.next() && rs.getInt(1) > 0; }
+            }
+        }
+    }
     public List<ProviderAvailability> findByProvider(int providerId) throws SQLException {
         List<ProviderAvailability> list = new ArrayList<>();
         try (Connection c = DBConnection.getConnection(); PreparedStatement ps = c.prepareStatement("SELECT * FROM provider_availability WHERE provider_id=? ORDER BY availability_id DESC")) {

@@ -14,6 +14,7 @@ public class AdminController extends HttpServlet {
     private final AdminService adminService = new AdminService();
     private final BookingService bookingService = new BookingService();
     private final ReportService reportService = new ReportService();
+    private final NotificationService notificationService = new NotificationService();
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (!SessionUtil.requireRole(req, "ADMIN")) { resp.sendRedirect(req.getContextPath() + "/login"); return; }
@@ -25,6 +26,11 @@ public class AdminController extends HttpServlet {
             req.setAttribute("bookings", bookingService.allBookings());
             req.setAttribute("complaints", adminService.complaints());
             req.setAttribute("report", reportService.dashboardReport());
+            User user = SessionUtil.currentUser(req);
+            if (user != null) {
+                req.setAttribute("notifications", notificationService.recent(user.getUserId()));
+                req.setAttribute("unreadNotificationCount", notificationService.unreadCount(user.getUserId()));
+            }
             req.getRequestDispatcher(VIEW_PREFIX + "/admin" + path + ".jsp").forward(req, resp);
         } catch (Exception e) { throw new ServletException(e); }
     }
@@ -33,6 +39,8 @@ public class AdminController extends HttpServlet {
         if (!SessionUtil.requireRole(req, "ADMIN")) { resp.sendRedirect(req.getContextPath() + "/login"); return; }
         try {
             String action = req.getParameter("action");
+            User user = SessionUtil.currentUser(req);
+            if ("markNotificationsRead".equals(action) && user != null) notificationService.markAllRead(user.getUserId());
             if ("userStatus".equals(action)) adminService.userStatus(Integer.parseInt(req.getParameter("userId")), req.getParameter("status"));
             if ("providerVerification".equals(action)) adminService.providerVerification(Integer.parseInt(req.getParameter("providerId")), req.getParameter("status"));
             if ("category".equals(action)) {

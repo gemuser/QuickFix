@@ -49,13 +49,32 @@ if (!window.quickFixUiReady) {
     targets.forEach((element) => observer.observe(element));
   }
 
+  function setupDigitOnlyFields() {
+    document.querySelectorAll("[data-digits-only]").forEach((input) => {
+      input.addEventListener("input", function () {
+        const cleaned = input.value.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
+        if (input.value !== cleaned) input.value = cleaned;
+      });
+    });
+  }
+
   document.addEventListener("change", function (event) {
     if (event.target.name === "bookingId") syncSelectedProvider(event.target);
+  });
+
+  document.addEventListener("click", function (event) {
+    const isTrayClick = event.target.closest(".notification-tray");
+    if (!isTrayClick) {
+      document.querySelectorAll(".notification-tray__list.is-open").forEach(list => {
+        list.classList.remove("is-open");
+      });
+    }
   });
 
   document.addEventListener("DOMContentLoaded", function () {
     document.body.classList.add("motion-ready");
     syncSelectedProvider(document.querySelector('select[name="bookingId"]'));
+    setupDigitOnlyFields();
     setupRevealMotion();
   });
 }

@@ -23,6 +23,9 @@
         <c:if test="${not empty error}">
             <div class="alert alert--error">${error}</div>
         </c:if>
+        <c:if test="${param.registered == '1'}">
+            <div class="alert alert--success">Account created successfully.</div>
+        </c:if>
         <form class="form" method="post" action="${pageContext.request.contextPath}/login">
             <label class="field">
                 <span class="field__label">Email address</span>

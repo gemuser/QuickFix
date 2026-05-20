@@ -210,3 +210,23 @@
         align-items: stretch;
     }
 }
+/* Universal Notification Tray Styles */
+.notification-tray { position: relative; display: inline-flex; }
+.market-icon-button, .notification-button { position: relative; }
+.notification-button__badge { position: absolute; top: -4px; right: -4px; background: #dc2626; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: 600; border: 2px solid white; line-height: 1; z-index: 2; }
+.market-icon-button::before, .market-icon-button::after, .notification-button::before, .notification-button::after { display: none !important; }
+.notification-tray__list { position: absolute; top: calc(100% + 8px); right: 0; width: 320px; max-height: min(420px, calc(100vh - 120px)); overflow-y: auto; overscroll-behavior: contain; background: white; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border-radius: 8px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s ease-in-out; }
+.notification-tray__list.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.notification-tray__header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; color: var(--text-dark); display: flex; justify-content: space-between; align-items: center; }
+.notification-tray__header .mark-all-read { font-size: 12px; color: var(--primary); background: none; border: none; cursor: pointer; padding: 0; }
+.notification-tray__header .mark-all-read:hover { text-decoration: underline; }
+.notification-tray__items { max-height: 380px; overflow-y: auto; }
+.notification-tray__item { padding: 16px; border-bottom: 1px solid var(--border); transition: background-color 0.2s; cursor: pointer; text-decoration: none; display: block; color: inherit; }
+.notification-tray__item:last-child { border-bottom: none; }
+.notification-tray__item:hover { background-color: #f9fafb; text-decoration: none; color: inherit; }
+.notification-tray__item--unread { background-color: #eff6ff; }
+.notification-tray__item--unread:hover { background-color: #dbeafe; }
+.notification-tray__item__title { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: var(--text-dark); }
+.notification-tray__item__text { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.4; }
+.notification-tray__item__time { font-size: 11px; color: #9ca3af; }
+.notification-tray__empty { padding: 32px 16px; text-align: center; color: var(--text-secondary); font-size: 13px; }

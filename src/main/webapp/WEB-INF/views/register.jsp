@@ -27,17 +27,17 @@
             <div class="field">
                 <span class="field__label">Role</span>
                 <div class="role-choice">
-                    <input class="role-choice__input" id="roleCustomer" type="radio" name="role" value="CUSTOMER" checked>
+                    <input class="role-choice__input" id="roleCustomer" type="radio" name="role" value="CUSTOMER" ${role == null || role == 'CUSTOMER' ? 'checked' : ''}>
                     <label class="role-choice__label" for="roleCustomer"><span class="role-choice__title">Customer</span><span class="role-choice__meta">Book and track home services</span></label>
-                    <input class="role-choice__input" id="roleProvider" type="radio" name="role" value="PROVIDER">
+                    <input class="role-choice__input" id="roleProvider" type="radio" name="role" value="PROVIDER" ${role == 'PROVIDER' ? 'checked' : ''}>
                     <label class="role-choice__label" for="roleProvider"><span class="role-choice__title">Provider</span><span class="role-choice__meta">Manage requests and services</span></label>
                 </div>
             </div>
             <div class="form__grid">
-                <label class="field"><span class="field__label">Full name</span><input class="field__control" name="fullName" value="${fullName != null ? fullName : ''}" required><span class="field__error">${fullNameError}</span></label>
-                <label class="field"><span class="field__label">Phone</span><input class="field__control" name="phone" value="${phone != null ? phone : ''}"><span class="field__error">${phoneError}</span></label>
-                <label class="field"><span class="field__label">Email</span><input class="field__control" type="email" name="email" value="${email != null ? email : ''}" required><span class="field__error">${emailError}</span></label>
-                <label class="field"><span class="field__label">Password</span><input class="field__control" type="password" name="password" required><span class="field__error">${passwordError}</span></label>
+                <label class="field"><span class="field__label">Full name</span><input class="field__control" name="fullName" value="${fullName != null ? fullName : ''}" maxlength="100" autocomplete="name" required><span class="field__error">${fullNameError}</span></label>
+                <label class="field"><span class="field__label">Phone</span><input class="field__control" type="tel" name="phone" value="${phone != null ? phone : ''}" inputmode="tel" pattern="\+?[0-9]{7,15}" minlength="7" maxlength="16" autocomplete="tel" title="Enter an optional + followed by 7 to 15 digits" data-digits-only required><span class="field__error">${phoneError}</span></label>
+                <label class="field"><span class="field__label">Email</span><input class="field__control" type="email" name="email" value="${email != null ? email : ''}" maxlength="120" autocomplete="email" required><span class="field__error">${emailError}</span></label>
+                <label class="field"><span class="field__label">Password</span><input class="field__control" type="password" name="password" minlength="8" pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,}" autocomplete="new-password" title="Use at least 8 characters with a letter and a number" required><span class="field__error">${passwordError}</span></label>
             </div>
             <div class="form__grid form__grid--single">
                 <label class="field"><span class="field__label">Address</span><textarea class="field__control" name="address" placeholder="Street, city, state, postal code"></textarea><span class="field__hint">Used for customer booking locations and provider service coverage.</span></label>

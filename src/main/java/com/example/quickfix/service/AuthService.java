@@ -27,10 +27,11 @@ public class AuthService {
         String normalizedEmail = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
         String normalizedPhone = phone == null ? null : phone.trim();
         if (normalizedPhone != null && normalizedPhone.isEmpty()) normalizedPhone = null;
-        if (ValidationUtil.isBlank(normalizedName) || !ValidationUtil.isEmail(normalizedEmail) || ValidationUtil.isBlank(password)) {
-            return "Please enter a valid name, email, and password.";
+        if (ValidationUtil.isBlank(normalizedName) || !ValidationUtil.isEmail(normalizedEmail)
+                || !ValidationUtil.isPhone(normalizedPhone) || !ValidationUtil.isStrongPassword(password)) {
+            return "Please enter a valid name, email, phone number, and password.";
         }
-        if (userDAO.findByEmail(normalizedEmail) != null) return "Email is already registered.";
+        if (userDAO.findByEmail(normalizedEmail) != null) return "User is already registered with this email.";
         if (!ValidationUtil.isBlank(normalizedPhone) && userDAO.findByPhone(normalizedPhone) != null) return "Phone number is already registered.";
         int roleId = roleDAO.findIdByName(normalizedRole);
         if (roleId == 0 || "ADMIN".equals(normalizedRole)) return "Invalid role selected.";
@@ -46,7 +47,7 @@ public class AuthService {
                 return "Phone number is already registered.";
             }
             if (userDAO.findByEmail(normalizedEmail) != null) {
-                return "Email is already registered.";
+                return "User is already registered with this email.";
             }
             throw e;
         }

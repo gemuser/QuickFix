@@ -2,6 +2,7 @@ package com.quickfix.dao;
 
 import com.quickfix.model.ProviderService;
 import com.quickfix.util.DBConnection;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
@@ -28,6 +29,12 @@ public class ProviderServiceDAO {
             ps.setInt(1, serviceId); ps.setInt(2, toStoredProviderId(c, providerId)); ps.executeUpdate();
         }
     }
+    public boolean updatePrice(int serviceId, int providerId, BigDecimal price) throws SQLException {
+        try (Connection c = DBConnection.getConnection(); PreparedStatement ps = c.prepareStatement("UPDATE provider_services SET price=? WHERE " + resolveServiceIdColumn(c) + "=? AND provider_id=?")) {
+            ps.setBigDecimal(1, price); ps.setInt(2, serviceId); ps.setInt(3, toStoredProviderId(c, providerId));
+            return ps.executeUpdate() > 0;
+        }
+    }
     public ProviderService findById(int serviceId) throws SQLException {
         try (Connection c = DBConnection.getConnection()) {
             String sql = baseSql(c) + " WHERE ps." + resolveServiceIdColumn(c) + "=?";
@@ -51,7 +58,7 @@ public class ProviderServiceDAO {
         try (Connection c = DBConnection.getConnection()) {
             String statusColumn = hasColumn(c, "users", "status") ? "status" : "account_status";
             String approvalColumn = hasColumn(c, "provider_profiles", "verification_status") ? "verification_status" : "approval_status";
-            String ratingProviderExpression = providerServicesUseProfileId(c) ? "pp.user_id" : "ps.provider_id";
+            String ratingProviderExpression = ratingsFeedbackUsesProfileId(c) ? "pp." + resolveProfileIdColumn(c) : "pp.user_id";
             String descriptionColumn = resolveDescriptionColumn(c);
             String sql = baseSql(c) + " WHERE u." + statusColumn + "='ACTIVE' AND pp." + approvalColumn + "='APPROVED' " +
                 "AND (? IS NULL OR ps.category_id=?) AND (? IS NULL OR ps.price<=?) " +
@@ -92,10 +99,11 @@ public class ProviderServiceDAO {
         String serviceIdColumn = resolveServiceIdColumn(c);
         String descriptionColumn = resolveDescriptionColumn(c);
         String activeSelect = hasColumn(c, "provider_services", "active") ? "ps.active" : "TRUE AS active";
+        String ratingProviderExpression = ratingsFeedbackUsesProfileId(c) ? "pp." + resolveProfileIdColumn(c) : "pp.user_id";
         if (providerServicesUseProfileId(c)) {
-            return "SELECT ps." + serviceIdColumn + " AS service_id, pp.user_id AS provider_id, ps.category_id, ps.service_title, ps." + descriptionColumn + " AS description, ps.price, " + activeSelect + ", sc.category_name, u.full_name provider_name, COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=pp.user_id),0) AS average_rating FROM provider_services ps JOIN service_categories sc ON ps.category_id=sc.category_id JOIN provider_profiles pp ON ps.provider_id=pp.provider_id JOIN users u ON pp.user_id=u.user_id";
+            return "SELECT ps." + serviceIdColumn + " AS service_id, pp.user_id AS provider_id, ps.category_id, ps.service_title, ps." + descriptionColumn + " AS description, ps.price, " + activeSelect + ", sc.category_name, u.full_name provider_name, COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=" + ratingProviderExpression + "),0) AS average_rating FROM provider_services ps JOIN service_categories sc ON ps.category_id=sc.category_id JOIN provider_profiles pp ON ps.provider_id=pp.provider_id JOIN users u ON pp.user_id=u.user_id";
         }
-        return "SELECT ps." + serviceIdColumn + " AS service_id, ps.provider_id, ps.category_id, ps.service_title, ps." + descriptionColumn + " AS description, ps.price, " + activeSelect + ", sc.category_name, u.full_name provider_name, COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=ps.provider_id),0) AS average_rating FROM provider_services ps JOIN service_categories sc ON ps.category_id=sc.category_id JOIN users u ON ps.provider_id=u.user_id LEFT JOIN provider_profiles pp ON ps.provider_id=pp.user_id";
+        return "SELECT ps." + serviceIdColumn + " AS service_id, ps.provider_id, ps.category_id, ps.service_title, ps." + descriptionColumn + " AS description, ps.price, " + activeSelect + ", sc.category_name, u.full_name provider_name, COALESCE((SELECT AVG(rating) FROM ratings_feedback rf WHERE rf.provider_id=" + ratingProviderExpression + "),0) AS average_rating FROM provider_services ps JOIN service_categories sc ON ps.category_id=sc.category_id JOIN users u ON ps.provider_id=u.user_id LEFT JOIN provider_profiles pp ON ps.provider_id=pp.user_id";
     }
     private ProviderService map(ResultSet rs) throws SQLException {
         ProviderService s = new ProviderService();
@@ -125,6 +133,31 @@ public class ProviderServiceDAO {
 
     private boolean providerServicesUseProfileId(Connection c) throws SQLException {
         return hasColumn(c, "provider_profiles", "provider_id") && !hasColumn(c, "provider_profiles", "profile_id");
+    }
+
+    private boolean ratingsFeedbackUsesProfileId(Connection c) throws SQLException {
+        DatabaseMetaData meta = c.getMetaData();
+        try (ResultSet rs = meta.getImportedKeys(c.getCatalog(), null, "ratings_feedback")) {
+            while (rs.next()) {
+                if ("provider_id".equalsIgnoreCase(rs.getString("FKCOLUMN_NAME"))) {
+                    return "provider_profiles".equalsIgnoreCase(rs.getString("PKTABLE_NAME"));
+                }
+            }
+        }
+        try (ResultSet rs = meta.getImportedKeys(c.getCatalog(), null, "RATINGS_FEEDBACK")) {
+            while (rs.next()) {
+                if ("PROVIDER_ID".equalsIgnoreCase(rs.getString("FKCOLUMN_NAME"))) {
+                    return "PROVIDER_PROFILES".equalsIgnoreCase(rs.getString("PKTABLE_NAME"));
+                }
+            }
+        }
+        return providerServicesUseProfileId(c);
+    }
+
+    private String resolveProfileIdColumn(Connection c) throws SQLException {
+        if (hasColumn(c, "provider_profiles", "profile_id")) return "profile_id";
+        if (hasColumn(c, "provider_profiles", "provider_id")) return "provider_id";
+        throw new SQLException("Neither profile_id nor provider_id exists in provider_profiles table.");
     }
 
     private int toStoredProviderId(Connection c, int userId) throws SQLException {

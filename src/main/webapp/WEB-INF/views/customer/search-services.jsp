@@ -26,7 +26,7 @@
             <aside class="card market-filter">
                 <div class="card__header"><h2 class="card__title">Filters</h2></div>
                 <form class="card__body form" method="get">
-                    <label class="field"><span class="field__label">Category</span><select class="field__control" name="categoryId"><option value="">All categories</option><c:forEach items="${categories}" var="c"><option value="${c.categoryId}">${c.categoryName}</option></c:forEach></select></label>
+                    <label class="field"><span class="field__label">Category</span><select class="field__control" name="categoryId"><option value="">All categories</option><c:forEach items="${categories}" var="c"><option value="${c.categoryId}" ${param.categoryId == c.categoryId ? 'selected' : ''}>${c.categoryName}</option></c:forEach></select></label>
                     <label class="field"><span class="field__label">Price range</span><input class="field__control" name="maxPrice" type="number" value="${param.maxPrice}" placeholder="Max price"></label>
                     <label class="field"><span class="field__label">Rating</span><select class="field__control" name="minRating"><option value="">Any rating</option><option value="3.0">3.0+</option><option value="4.0">4.0+</option><option value="4.5">4.5+</option></select></label>
                     <button class="btn btn--primary" type="submit">Apply</button>
@@ -47,7 +47,7 @@
                             </article>
                         </c:forEach>
                     </c:when>
-                    <c:otherwise><div class="empty-state">No services found.</div></c:otherwise>
+                    <c:otherwise><div class="empty-state">No providers found.</div></c:otherwise>
                 </c:choose>
             </div>
         </section>
